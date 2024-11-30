@@ -1,0 +1,22 @@
+variable "vpcCidr" {
+  type        = string
+  description = "CIDR block for the VPC."
+}
+
+variable "environment" {
+  type        = string
+  default     = "dev"
+  description = "Deployment environment."
+}
+
+
+variable "publicCidrs" {
+  type        = list(string)
+  description = "CIDR blocks for public subnets."
+}
+
+variable "privateCidrs" {
+  type        = list(string)
+  description = "CIDR blocks for private subnets."
+}
+
