@@ -1,24 +1,23 @@
 variable "environment" {
   type        = string
-  default     = "dev"
   description = "Deployment Environment"
 }
 
 variable "vpcCidr" {
   type        = string
-  description = "CIDR block for the VPC."
+  description = "CIDR block for the VPC"
   default     = "10.1.0.0/16"
 }
 
 variable "publicCidrs" {
   type        = list(string)
-  description = "CIDR blocks for public subnets."
+  description = "CIDR blocks for public subnets"
   default     = ["10.1.1.0/24", "10.1.2.0/24", "10.1.3.0/24", "10.1.4.0/24"]
 }
 
 variable "privateCidrs" {
   type        = list(string)
-  description = "CIDR blocks for private subnets."
+  description = "CIDR blocks for private subnets"
   default     = ["10.1.5.0/24", "10.1.6.0/24"]
 }
 
@@ -26,7 +25,7 @@ variable "privateCidrs" {
 //for global module
 
 # Webserver-specific variables
-
+/*
 variable "amiId" {
   description = "AMI ID for the webserver"
   type        = string
@@ -42,7 +41,7 @@ variable "instanceType" {
 variable "desiredCapacity" {
   description = "Desired capacity for ASG"
   type        = number
-  default  =   4
+  default  =   1
 }
 
 variable "maxSize" {
@@ -74,3 +73,4 @@ variable "region" {
   type        = string
   default     = "us-east-1"
 }
+*/
