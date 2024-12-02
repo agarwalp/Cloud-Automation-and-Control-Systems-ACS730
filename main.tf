@@ -66,7 +66,7 @@ resource "aws_nat_gateway" "myNatGateway" {
 }
 
 resource "aws_eip" "myNatGatewayEip" {
-  vpc = true
+  domain = "vpc" 
   tags = {
     Name = "acs730-group1-nat-gateway-eip"
   }
@@ -119,3 +119,26 @@ resource "aws_route_table_association" "myPrivateTableAssociation" {
   route_table_id = aws_route_table.myPrivateTable.id
   subnet_id      = each.value.id
 }
+
+
+//global module
+
+# Existing network resources here...
+
+# Call the webserver module
+module "webserver" {
+  source         = "../webserver module"  # Path to the webserver module
+
+  vpcId          = aws_vpc.myVpc.id
+  publicSubnets  = [for s in aws_subnet.myPublicSubnets : s.id]
+
+  amiId          = var.amiId       # Add these to the network module's variables.tf
+  instanceType   = var.instanceType
+  desiredCapacity = var.desiredCapacity
+  maxSize        = var.maxSize
+  minSize        = var.minSize
+  allowedHttpIps = var.allowedHttpIps
+  allowedSshIps  = var.allowedSshIps
+  environment    = var.environment
+}
+

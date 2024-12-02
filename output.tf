@@ -40,3 +40,5 @@ output "publicRouteTableId" {
 output "privateRouteTableId" {
   value = aws_route_table.myPrivateTable.id
 }
+
+
