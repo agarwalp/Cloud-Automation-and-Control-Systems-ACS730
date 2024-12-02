@@ -7,7 +7,7 @@ variable "region" {
 variable "amiId" {
   description = "AMI ID for the webserver"
   type        = string
-  default     = "ami-0453ec754f44f9a4a" 
+  default     = "ami-0453ec754f44f9a4a"
 }
 
 variable "instanceType" {
@@ -34,9 +34,8 @@ variable "minSize" {
   default     = 1
 }
 
-/*variable "environment" {
-  description = "Environment for the deployment"
+variable "key_pair_name" {
+  description = "The name of key pair to use for SSH access."
   type        = string
-  default     = "dev"
+  default     = "vockey"
 }
-*/
