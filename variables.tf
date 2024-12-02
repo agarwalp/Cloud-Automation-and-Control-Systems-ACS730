@@ -1,31 +1,18 @@
-variable "environment" {
+variable "region" {
+  description = "AWS region"
   type        = string
-  default     = "dev"
-  description = "Deployment Environment"
+  default     = "us-east-1"
 }
 
-variable "vpcCidr" {
+variable "vpcId" {
+  description = "VPC ID"
   type        = string
-  description = "CIDR block for the VPC."
-  default     = "10.1.0.0/16"
 }
 
-variable "publicCidrs" {
+variable "publicSubnets" {
+  description = "Public subnet IDs"
   type        = list(string)
-  description = "CIDR blocks for public subnets."
-  default     = ["10.1.1.0/24", "10.1.2.0/24", "10.1.3.0/24", "10.1.4.0/24"]
 }
-
-variable "privateCidrs" {
-  type        = list(string)
-  description = "CIDR blocks for private subnets."
-  default     = ["10.1.5.0/24", "10.1.6.0/24"]
-}
-
-
-//for global module
-
-# Webserver-specific variables
 
 variable "amiId" {
   description = "AMI ID for the webserver"
@@ -69,8 +56,9 @@ variable "allowedSshIps" {
   default     = ["0.0.0.0/0"]
 }
 
-variable "region" {
-  description = "AWS region"
+variable "environment" {
+  description = "Environment name"
   type        = string
-  default     = "us-east-1"
 }
+
+
