@@ -1,71 +1,111 @@
-# AWS provider
 provider "aws" {
-  region = "us-east-1"
+  region = var.region
 }
 
-# AMI Image details
-data "aws_ami" "ami_latest" {
-  owners      = ["amazon"]
-  most_recent = true
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+# Security Groups
+resource "aws_security_group" "WebServerSG" {
+  name_prefix = "${var.environment}-WebServer-SG"
+  vpc_id      = var.vpcId
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = var.allowedHttpIps
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = var.allowedSshIps
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "${var.environment}-WebServer-SG"
+    Environment = var.environment
   }
 }
 
-#Retriving info from remote state according to each deployment environment from network 
-data "terraform_remote_state" "network" {
-  backend = "s3"
-  config = {
-    bucket = "${var.env}-finalproject-acs730-group10" // bucket to get state according to different environments
-    key    = "${var.env}-Network/terraform.tfstate"
-    region = "us-east-1"
-  }
-}
+# Auto Scaling Group and Launch Configuration
+resource "aws_launch_configuration" "WebServerLC" {
+  name          = "${var.environment}-WebServer-LC"
+  image_id      = var.amiId
+  instance_type = var.instanceType
+  security_groups = [
+    aws_security_group.WebServerSG.id
+  ]
+  user_data = file("${path.module}/install_httpd.sh.tpl")
 
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
-
-#Tags
-locals {
-  default_tags = merge(module.globalvars.default_tags, { "env" = var.env })
-  prefix_all      = "${module.globalvars.prefix}-${var.env}"
-}
-
-module "globalvars" {
-  source = "../globalvars"
-}
-
-# SSH key for deployment provided based on environment
-resource "aws_key_pair" "ssh_key" {
-  key_name   = "ssh_key-${var.env}"
-  public_key = file(var.path_to_ssh_key)
-  tags = merge({
-    Name = "${local.prefix_all}"
-    },
-    local.default_tags
-  )
-}
-
-# Bastion Server
-resource "aws_instance" "Bastion_Server" {
-  ami                         = data.aws_ami.ami_latest.id
-  instance_type               = var.instance_type
-  key_name                    = aws_key_pair.ssh_key.key_name
-  subnet_id                   = data.terraform_remote_state.network.outputs.public_subnet_ids[0]
-  security_groups             = [aws_security_group.sg_bastion_server.id]
-  associate_public_ip_address = true
-  
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_autoscaling_group" "WebServerASG" {
+  desired_capacity     = var.desiredCapacity
+  max_size             = var.maxSize
+  min_size             = var.minSize
+  vpc_zone_identifier  = var.publicSubnets
+  launch_configuration = aws_launch_configuration.WebServerLC.id
   
-  tags = merge(local.default_tags,
-    {
-      "Name" = "${local.prefix_all}-Bastion-${var.env}"
-    }
-  )
+  target_group_arns = [aws_lb_target_group.WebTG.arn] 
+
+  tag {
+    key                 = "Name"
+    value               = "${var.environment}-WebServer"
+    propagate_at_launch = true
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# Load Balancer
+resource "aws_lb" "WebAlb" {
+  name               = "${var.environment}-Web-ALB"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.WebServerSG.id]
+  subnets            = var.publicSubnets
+
+  tags = {
+    Name        = "${var.environment}-Web-ALB"
+    Environment = var.environment
+  }
+}
+
+resource "aws_lb_target_group" "WebTG" {
+  name     = "${var.environment}-Web-TG"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = var.vpcId
+
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+}
+
+resource "aws_lb_listener" "WebListener" {
+  load_balancer_arn = aws_lb.WebAlb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.WebTG.arn
+  }
 }
 
