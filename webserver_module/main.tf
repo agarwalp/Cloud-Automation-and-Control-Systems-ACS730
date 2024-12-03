@@ -144,29 +144,21 @@ resource "aws_lb_target_group_attachment" "StandaloneWebServers" {
 }
 
 
-# Standalone Webserver in AZ3
-resource "aws_instance" "WebServer_AZ3" {
-  ami                         = var.amiId
-  instance_type               = var.instanceType
-  subnet_id                   = data.terraform_remote_state.network.outputs.publicSubnetIds[2] # AZ3
-  associate_public_ip_address = true
-  security_groups             = [aws_security_group.WebServerSG.id]
-
-  tags = {
-    Name = "webServer3"
+resource "aws_instance" "WebServer" {
+  for_each = {
+    AZ3 = "webServer3"
+    AZ4 = "webServer4"
   }
-}
 
-# Standalone Webserver in AZ4
-resource "aws_instance" "WebServer_AZ4" {
   ami                         = var.amiId
   instance_type               = var.instanceType
-  subnet_id                   = data.terraform_remote_state.network.outputs.publicSubnetIds[3] # AZ4
+  subnet_id                   = data.terraform_remote_state.network.outputs.publicSubnetIds[each.key == "AZ3" ? 2 : 3]
   associate_public_ip_address = true
+    key_name                    = var.key_pair_name
   security_groups             = [aws_security_group.WebServerSG.id]
 
   tags = {
-    Name = "webServer4"
+    Name = each.value
   }
 }
 
@@ -222,16 +214,3 @@ resource "aws_security_group" "privateVmSG" {
   }
 }
 
-# Bastion Host VM in Public Subnet 2
-resource "aws_instance" "BastionVM" {
-  ami                         = var.amiId
-  instance_type               = "t2.micro"                                                     # Adjust instance type as needed
-  subnet_id                   = data.terraform_remote_state.network.outputs.publicSubnetIds[1] # Public Subnet 2
-  key_name                    = var.key_pair_name
-  associate_public_ip_address = true
-  security_groups             = [aws_security_group.privateVmSG.id]
-
-  tags = {
-    Name = "bastionVM"
-  }
-}
