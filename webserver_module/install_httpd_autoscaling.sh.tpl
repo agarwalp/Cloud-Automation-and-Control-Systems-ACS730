@@ -1,22 +1,34 @@
 #!/bin/bash
+# Update packages and install Apache HTTP Server
+sudo yum update -y
+sudo yum install -y httpd
 
-INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+# Start and enable Apache
+sudo systemctl start httpd
+sudo systemctl enable httpd
 
-echo "WebServer${INSTANCE_ID}" > /etc/hostname
-hostnamectl set-hostname "WebServer${INSTANCE_ID}"
+# Use the S3 URL of your image
+IMAGE_URL="https://acs730finalproj-dev1.s3.us-east-1.amazonaws.com/1.jpg" 
 
-echo "<!DOCTYPE html>
+# Create the HTML file
+sudo bash -c 'cat > /var/www/html/index.html <<EOF
+<!DOCTYPE html>
 <html>
 <head>
-    <title>HTTPD Test</title>
+    <title>ACS-Final-Assignment-Group1</title>
 </head>
 <body>
-    <h1>HTTPD is working!</h1>
-    <p>Instance ID: ${INSTANCE_ID}</p>
+    <h1 style="text-align: center; color: blue;">ACS-Final-Assignment-Group1</h1>
+    <div style="text-align: center;">
+        <img src="'$IMAGE_URL'" alt="Group Image" width="300">
+    </div>
+    <p style="text-align: center;">Created by Pooja, Poonam, Shailendra, and Arjoo</p>
 </body>
-</html>" > /var/www/html/index.html
+</html>
+EOF'
 
-# Install and start HTTPD
-yum install -y httpd
-systemctl enable httpd
-systemctl start httpd
+# Ensure proper permissions
+sudo chmod -R 755 /var/www/html
+
+# Restart Apache to apply changes
+sudo systemctl restart httpd
