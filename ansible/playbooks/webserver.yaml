@@ -1,0 +1,156 @@
+---
+- name: Configure web servers and related infrastructure
+  hosts: webservers
+  become: true
+  tasks:
+    - name: Install HTTPD (Apache) on web servers
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start HTTPD service
+      service:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: Ensure firewall allows HTTP traffic
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: yes
+
+    - name: Ensure firewall allows SSH traffic
+      firewalld:
+        service: ssh
+        permanent: true
+        state: enabled
+        immediate: yes
+
+    - name: Create a simple website content directory
+      file:
+        path: /var/www/html
+        state: directory
+        owner: apache
+        group: apache
+        mode: '0755'
+
+    - name: Add website index.html content
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Welcome to Our Website</title>
+            <style>
+              body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+              h1 { color: #3333cc; }
+              p { color: #555555; }
+            </style>
+          </head>
+          <body>
+            <h1>Welcome to Our Web Server</h1>
+            <p>This page is served by an Apache server running on AWS EC2.</p>
+            <p>Thanks for visiting!</p>
+          </body>
+          </html>
+        owner: apache
+        group: apache
+        mode: '0644'
+
+    - name: Restart HTTPD service to apply changes
+      service:
+        name: httpd
+        state: restarted
+
+- name: Configure Bastion Host
+  hosts: bastion
+  become: true
+  tasks:
+    - name: Install SSH server (if needed)
+      yum:
+        name: openssh-server
+        state: present
+
+    - name: Start SSH service
+      service:
+        name: sshd
+        state: started
+        enabled: true
+
+    - name: Ensure Bastion Host allows SSH traffic
+      firewalld:
+        service: ssh
+        permanent: true
+        state: enabled
+        immediate: yes
+
+- name: Configure Private Servers (Linux VMs)
+  hosts: private_servers
+  become: true
+  tasks:
+    - name: Install necessary software on private VMs
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start HTTPD service on private VMs
+      service:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: Ensure firewall allows SSH traffic
+      firewalld:
+        service: ssh
+        permanent: true
+        state: enabled
+        immediate: yes
+
+    - name: Ensure firewall allows HTTP traffic
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: yes
+
+- name: Configure Load Balancer Target Group
+  hosts: localhost
+  become: false
+  tasks:
+    - name: Register web servers with load balancer target group
+      aws_lb_target_group_attachment:
+        target_group_arn: "{{ lookup('env', 'WEB_TG_ARN') }}"
+        target_id: "{{ lookup('env', 'WEB_SERVER_ID') }}"
+        port: 80
+        region: us-east-1
+
+- name: Ensure Auto Scaling Group Web Servers
+  hosts: webservers
+  become: true
+  tasks:
+    - name: Ensure all instances are part of Auto Scaling Group
+      aws_asg:
+        name: "WebServer-ASG"
+        desired_capacity: 3
+        max_size: 5
+        min_size: 1
+        vpc_zone_identifier: "{{ lookup('env', 'PUBLIC_SUBNETS') }}"
+        launch_configuration_name: "{{ lookup('env', 'WEB_LAUNCH_CONFIG') }}"
+        state: present
+        region: us-east-1
+
+- name: Ensure Web Servers are Registered with Load Balancer
+  hosts: localhost
+  become: false
+  tasks:
+    - name: Register EC2 instances with Load Balancer
+      aws_lb_target_group_attachment:
+        target_group_arn: "{{ lookup('env', 'WEB_TG_ARN') }}"
+        target_id: "{{ lookup('env', 'WEB_SERVER_ID') }}"
+        port: 80
+        region: us-east-1
