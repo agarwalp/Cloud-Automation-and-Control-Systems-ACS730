@@ -8,7 +8,7 @@ sudo systemctl start httpd
 sudo systemctl enable httpd
 
 # Use the S3 URL of your image
-IMAGE_URL="https://acs730finalproj-dev1.s3.us-east-1.amazonaws.com/1.jpg" 
+IMAGE_URL="https://acs730finalproj-dev.s3.us-east-1.amazonaws.com/picture.jpg" 
 
 # Create the HTML file
 sudo bash -c 'cat > /var/www/html/index.html <<EOF
