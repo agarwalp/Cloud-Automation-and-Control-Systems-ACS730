@@ -1,0 +1,44 @@
+---
+- name: Install and Configure HTTPD
+  hosts: _webServer3:_webServer4
+  become: true
+  tasks:
+    - name: Update the system
+      yum:
+        name: "*"
+        state: latest
+
+    - name: Install HTTPD
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start and enable HTTPD
+      service:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: Create the index.html file
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>ACS-Final-Assignment-Group1</title>
+          </head>
+          <body>
+              <h1 style="text-align: center; color: blue;">ACS-Final-Project-Group1</h1>
+              <p style="text-align: center;">Created by Pooja, Poonam, Shailendra, and Arjoo</p>
+              <div style="text-align: center;">
+              <img src="https://acs730finalproj-dev.s3.amazonaws.com/picture.jpg" alt="S3 Image">
+              </div>
+          </body>
+          </html>
+    - name: Ensure proper permissions for the web directory
+      file:
+        path: /var/www/html
+        state: directory
+        mode: '0755'
+        recurse: yes
