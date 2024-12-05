@@ -5,7 +5,7 @@
     - name: Ping Test
       ping:
 
-    - name: Check HTTPD Service Status
+    - name: Check HTTP Service Status
       service:
         name: httpd
         state: started
