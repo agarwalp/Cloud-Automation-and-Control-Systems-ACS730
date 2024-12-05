@@ -5,5 +5,5 @@ keyed_groups:
   - key: tags.Name
 filters:
   tag:Name:
-    - webServer3
-    - webServer4
+    - webServer
+    - webServer
