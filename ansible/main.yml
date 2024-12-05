@@ -38,7 +38,7 @@
           </html>
     - name: Ensure proper permissions for the web directory
       file:
-        path: /var/ww/html
+        path: /var/www/html
         state: directory
         mode: '0755'
         recurse: yes
