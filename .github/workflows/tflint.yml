@@ -3,7 +3,7 @@ name: TFLint Scan
 on:
   push:
     branches:
-      - Staging
+      - Dev
 
 jobs:
   tflint:
