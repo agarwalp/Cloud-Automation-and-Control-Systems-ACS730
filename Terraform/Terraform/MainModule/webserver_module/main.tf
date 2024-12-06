@@ -1,9 +1,16 @@
-#provider block
-provider "aws" {
-  region = var.region
-}
+terraform {
+  required_version = ">= 1.3.0" 
 
-#Referring to Network module via remote statefile
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 4.0.0, < 5.0.0" 
+    }
+  }
+  
+  provider "aws" {
+  region = "us-east-1"
+}#Referring to Network module via remote statefile
 data "terraform_remote_state" "network" {
   backend = "s3"
   config = {
