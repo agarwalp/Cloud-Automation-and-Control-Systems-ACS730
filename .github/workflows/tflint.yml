@@ -1,1 +1,36 @@
+name: TFLint Scan
+
+on:
+  push:
+    branches:
+      - Dev  # Add as many branches as needed
+
+jobs:
+  tflint:
+    name: Run TFLint
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_wrapper: false
+
+    - name: Install TFLint
+      run: |
+        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+        tflint --version
+
+    - name: Run TFLint on network_module
+      working-directory: terraform/network_module
+      run: |
+        tflint
+
+    - name: Run TFLint on webserver_module
+      working-directory: terraform/webserver_module
+      run: |
+        tflint
 
