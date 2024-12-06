@@ -1,0 +1,56 @@
+---
+- name: Install and Configure Apache HTTPD on Web Servers
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Update all packages
+      yum:
+        name: "*"
+        state: latest
+
+    - name: Install Apache HTTP Server
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start and enable Apache service
+      service:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: Retrieve Name Tag from Hostvars
+      set_fact:
+        webserver_name: "{{ hostvars[inventory_hostname].tags.Name }}"
+
+    - name: Create a custom index.html
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+               <title>{{ webserver_name }}</title>
+          </head>
+          <body>
+              <h1 style="text-align: center; color: blue;">ACS730-FinalProject-Group1</h1>
+              <p style="text-align: center;">Web Server Name: {{ webserver_name }}</p>
+              <p style="text-align: center;">Created by Pooja, Poonam, Shailendra, and Arjoo</p>
+              <div style="text-align: center;">
+              <img src="https://group1-acs730finalproject-staging.s3.us-east-1.amazonaws.com/1.jpg" width="300">
+              </div>
+          </body>
+          </html>
+        dest: /var/www/html/index.html
+
+    - name: Set permissions for web directory
+      file:
+        path: /var/www/html
+        state: directory
+        mode: '0755'
+        recurse: true
+
+    - name: Restart Apache
+      service:
+        name: httpd
+        state: restarted
