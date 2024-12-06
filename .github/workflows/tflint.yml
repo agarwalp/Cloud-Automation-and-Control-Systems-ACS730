@@ -1,36 +1,35 @@
-name: TFLint Scan
+name: TFLint Checks on Terraform Code
 
 on:
   push:
     branches:
-      - Dev  # Add as many branches as needed
+      - Dev
+permissions: read-all
 
 jobs:
-  tflint:
-    name: Run TFLint
+  tflint-checks:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      
+      - name: Check out Git Repository
+        uses: actions/checkout@v4
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_wrapper: false
+      - uses: actions/cache@v4
+        name: Cache plugin dir
+        with:
+          path: ~/.tflint.d/plugins
+          key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
 
-    - name: Install TFLint
-      run: |
-        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-        tflint --version
+      - uses: terraform-linters/setup-tflint@v4.0.0
+        name: Setup TFLint
+        with:
+          github_token: ${{ secrets.CI_GITHUB_TOKEN }}
 
-    - name: Run TFLint on network_module
-      working-directory: terraform/network_module
-      run: |
-        tflint
+      - name: Show version
+        run: tflint --version
 
-    - name: Run TFLint on webserver_module
-      working-directory: terraform/webserver_module
-      run: |
-        tflint
+      - name: Init TFLint
+        run: tflint --init
 
+      - name: Run TFLint
+        run: tflint -f compact --recursive
