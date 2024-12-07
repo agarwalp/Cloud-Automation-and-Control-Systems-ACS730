@@ -52,4 +52,6 @@ The repository is organized into the following branches:
 
 ---
 
+For detailed implementation steps and insights, refer to the Prod environment-specific ProjectReportREADME file in the Prod repository.
+
 
