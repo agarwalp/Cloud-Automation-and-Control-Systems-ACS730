@@ -1,16 +1,20 @@
 terraform {
-  required_version = ">= 1.3.0" 
+  required_version = ">= 1.3.0"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 4.0.0, < 5.0.0" 
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
-  
-  provider "aws" {
+}
+
+provider "aws" {
   region = "us-east-1"
-}#Referring to Network module via remote statefile
+}
+
+
+#Referring to Network module via remote statefile
 data "terraform_remote_state" "network" {
   backend = "s3"
   config = {
@@ -54,7 +58,7 @@ resource "aws_autoscaling_group" "WebServerASG" {
 
   tag {
     key                 = "Name"
-    value               = "${var.env}WwebServer-Autoscaled"
+    value               = "${var.env}WebServer-Autoscaled"
     propagate_at_launch = true
   }
   lifecycle {

@@ -1,15 +1,15 @@
-
 terraform {
-  required_version = ">= 1.3.0" 
+  required_version = ">= 1.3.0"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 4.0.0, < 5.0.0" 
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
-  
-  provider "aws" {
+}
+
+provider "aws" {
   region = "us-east-1"
 }
 
@@ -85,7 +85,7 @@ resource "aws_nat_gateway" "myNatGateway" {
 }
 
 resource "aws_eip" "myNatGatewayEip" {
-  domain = "vpc"
+  #domain = "vpc"
   tags = {
     Name = "${var.env}NatGatewayEIP"
   }
