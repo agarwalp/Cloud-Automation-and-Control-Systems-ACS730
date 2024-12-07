@@ -1,5 +1,5 @@
-Two-Tier Web Application Automation with Terraform, Ansible, and GitHub Actions
-
+**Two-Tier Web Application Automation with Terraform, Ansible, and GitHub Actions
+**
 Group 1 - ACS730 - Final Project
 
 Authors:
