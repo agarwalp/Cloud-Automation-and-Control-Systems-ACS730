@@ -1,6 +1,6 @@
-Final Project: Two-Tier Web Application Automation with Terraform, Ansible, and GitHub Actions
+Two-Tier Web Application Automation with Terraform, Ansible, and GitHub Actions
 
-Group 1 - ACS 730 - Final Project
+Group 1 - ACS730 - Final Project
 
 Authors:
 
@@ -20,11 +20,11 @@ This project demonstrates the automation of a two-tier web application deploymen
 
 The project repository is structured with three branches:
 
-dev: For Development environment
+Dev: For Development environment
 
-staging: For Staging environment
+Staging: For Staging environment
 
-prod: For Production environment
+Prod: For Production environment
 
 Each environment is isolated, enabling independent testing and deployment. The automation pipeline integrates GitHub Actions for CI/CD workflows, ensuring streamlined and error-free deployments.
 
@@ -44,14 +44,15 @@ CI/CD Integration: GitHub Actions automate the deployment pipeline.
 
 Environment Isolation: Separate branches and configurations for Dev, Staging, and Prod environments.
 
+
 Repository Structure
 
 The repository is organized into the following branches:
 
-Dev Branch: Contains Terraform and Ansible configurations for Development environment.
+Dev Branch: Contains Terraform configurations for Development environment.
 
-Staging Branch: Contains configurations for the Staging environment.
+Staging Branch: Contains Terraform configurations and TFlint file for the Staging environment.
 
-Prod Branch: Contains configurations for the Production environment.
+Prod Branch: Contains Terraform and Ansible configurations along with TFlint file for the Production environment.
 
-Each branch ensures isolated deployments, reducing the risk of conflicts and enabling effective testing.
+
