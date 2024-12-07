@@ -9,8 +9,8 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "group1-acs730finalproject-prod"         
+    bucket = "group1-acs730finalproject-prod"
     key    = "prod/webserver_module/terraform.tfstate" # Key for state file
-    region = "us-east-1"                                  # Region for the S3 bucket
+    region = "us-east-1"                               # Region for the S3 bucket
   }
 }
