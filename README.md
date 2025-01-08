@@ -1,17 +1,5 @@
 # Two-Tier Web Application Automation with Terraform, Ansible, and GitHub Actions
 
-## Group 1 - ACS730 - Final Project
-
-**Authors:**
-- Poonam Agarwal
-- Pooja Sekar
-- Shailendra Khushwaha
-- Arjoo Khattri
-
-**Professor:** Bhargava Muralidharan
-
----
-
 ## Project Overview
 
 This project demonstrates the automation of a two-tier web application deployment using Terraform, Ansible, and GitHub Actions. The infrastructure spans across three environments: Development, Staging, and Production. By leveraging Infrastructure as Code (IaC) and Configuration Management tools, the deployment process becomes efficient, reliable, and scalable.
